@@ -7,8 +7,8 @@ passlib==1.7.4
 bcrypt==4.0.1
 python-dotenv==1.0.0
 stripe==7.11.0
+httpx>=0.24.0,<0.26.0
 supabase==2.3.1
 pydantic==2.5.3
-httpx==0.26.0
 
 # PyTorch CPU-only versions will be installed in Dockerfile
