@@ -1,57 +1,84 @@
-FROM python:3.10-slim
+fastapi==0.115.6
+uvicorn==0.27.0
+python-multipart==0.0.20
+python-jose==3.3.0
+passlib==1.7.4
+bcrypt==4.0.1
+python-dotenv==1.0.0
+stripe==7.11.0
+supabase==2.3.1
+pydantic==2.10.3
+numpy==1.24.3
+tomli==2.0.1
+httpx==0.24.1
+sniffio==1.3.0
+anyio==3.7.1
 
-WORKDIR /app
+# F5-TTS dependencies
+soundfile==0.12.1
+librosa==0.10.1
+scipy==1.11.4
+transformers==4.47.0
+einops==0.8.0
+torchdiffeq==0.2.5
+x_transformers==1.42.26
+vocos==0.1.0
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    curl \
-    software-properties-common \
-    git \
-    ffmpeg \
-    && rm -rf /var/lib/apt/lists/*
 
-# Create and activate virtual environment
-RUN python -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
+# FROM python:3.10-slim
 
-# Upgrade pip and install wheel
-RUN pip install --no-cache-dir --upgrade pip wheel setuptools
+# WORKDIR /app
 
-# Install PyTorch CPU version
-RUN pip install --no-cache-dir torch==2.1.0+cpu torchaudio==2.1.0+cpu --extra-index-url https://download.pytorch.org/whl/cpu
+# # Install system dependencies
+# RUN apt-get update && apt-get install -y \
+#     build-essential \
+#     curl \
+#     software-properties-common \
+#     git \
+#     ffmpeg \
+#     && rm -rf /var/lib/apt/lists/*
 
-# Copy and install requirements first
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# # Create and activate virtual environment
+# RUN python -m venv /opt/venv
+# ENV PATH="/opt/venv/bin:$PATH"
 
-# Clone and install F5-TTS with specific steps
-RUN git clone --depth 1 https://github.com/SWivid/F5-TTS.git && \
-    cd F5-TTS && \
-    # Install in development mode to ensure proper module structure
-    pip install -e . && \
-    # Verify installation
-    python -c "from f5_tts.infer.cli import TTSInference" && \
-    cd ..
+# # Upgrade pip and install wheel
+# RUN pip install --no-cache-dir --upgrade pip wheel setuptools
 
-# Copy application code
-COPY . .
+# # Install PyTorch CPU version
+# RUN pip install --no-cache-dir torch==2.1.0+cpu torchaudio==2.1.0+cpu --extra-index-url https://download.pytorch.org/whl/cpu
 
-# Create necessary directories
-RUN mkdir -p voice_configs
-RUN mkdir -p tts_output
+# # Copy and install requirements first
+# COPY requirements.txt .
+# RUN pip install --no-cache-dir -r requirements.txt
 
-# Set environment variables
-ENV PYTHONUNBUFFERED=1
-ENV PORT=8000
-# Add F5-TTS to Python path
-ENV PYTHONPATH="${PYTHONPATH}:/app/F5-TTS"
+# # Clone and install F5-TTS with specific steps
+# RUN git clone --depth 1 https://github.com/SWivid/F5-TTS.git && \
+#     cd F5-TTS && \
+#     # Install in development mode to ensure proper module structure
+#     pip install -e . && \
+#     # Verify installation
+#     python -c "from f5_tts.infer.cli import TTSInference" && \
+#     cd ..
 
-# Expose port
-EXPOSE 8000
+# # Copy application code
+# COPY . .
 
-# Start the application with multiple workers
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+# # Create necessary directories
+# RUN mkdir -p voice_configs
+# RUN mkdir -p tts_output
+
+# # Set environment variables
+# ENV PYTHONUNBUFFERED=1
+# ENV PORT=8000
+# # Add F5-TTS to Python path
+# ENV PYTHONPATH="${PYTHONPATH}:/app/F5-TTS"
+
+# # Expose port
+# EXPOSE 8000
+
+# # Start the application with multiple workers
+# CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
 
 # FROM python:3.10-slim
 
