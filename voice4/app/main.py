@@ -15,9 +15,9 @@ import tempfile
 import wave
 import json
 from datetime import datetime
-from f5_tts.models.f5 import F5TTS
-from f5_tts.models.e2 import E2TTS
-from f5_tts.utils.audio import load_audio, save_audio
+from f5_tts.infer.cli import TTSInference
+from f5_tts.socket_server import RealTimeInference
+from f5_tts.infer.speech_edit import SpeechEditor
 import httpx
 
 load_dotenv()
