@@ -1,3 +1,4 @@
+# Web framework and dependencies
 fastapi==0.109.0
 uvicorn==0.27.0
 python-multipart==0.0.6
@@ -8,6 +9,8 @@ python-dotenv==1.0.0
 stripe==7.11.0
 supabase==2.3.1
 pydantic==2.5.3
-torch==2.1.0
-torchaudio==2.1.0
-git+https://github.com/SWivid/F5-TTS.git
+
+# PyTorch CPU-only versions
+torch==2.1.0+cpu
+torchaudio==2.1.0+cpu
+-f https://download.pytorch.org/whl/torch_stable.html
