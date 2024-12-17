@@ -15,10 +15,13 @@ RUN apt-get update && apt-get install -y \
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Install PyTorch CPU version instead of CUDA version
-RUN pip install --no-cache-dir torch==2.1.0+cpu torchaudio==2.1.0+cpu -f https://download.pytorch.org/whl/cpu/torch_stable.html
+# Upgrade pip and install wheel
+RUN pip install --no-cache-dir --upgrade pip wheel setuptools
 
-# Install Python dependencies
+# Install PyTorch CPU version
+RUN pip install --no-cache-dir torch==2.1.0+cpu torchaudio==2.1.0+cpu --extra-index-url https://download.pytorch.org/whl/cpu
+
+# Copy and install requirements first
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
