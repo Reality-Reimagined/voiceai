@@ -25,16 +25,10 @@ RUN pip install --no-cache-dir torch==2.1.0+cpu torchaudio==2.1.0+cpu --extra-in
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Clone F5-TTS
-RUN git clone --depth 1 https://github.com/SWivid/F5-TTS.git /app/F5-TTS
-
-# Install F5-TTS dependencies separately
-WORKDIR /app/F5-TTS
-RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install --no-cache-dir .
-
-# Return to app directory
-WORKDIR /app
+# Clone and install F5-TTS
+RUN git clone --depth 1 https://github.com/SWivid/F5-TTS.git /app/F5-TTS && \
+    cd /app/F5-TTS && \
+    pip install --no-cache-dir .
 
 # Copy application code
 COPY . .
@@ -53,7 +47,6 @@ EXPOSE 8000
 
 # Start the application with multiple workers
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
-
 
 # FROM python:3.10-slim
 
