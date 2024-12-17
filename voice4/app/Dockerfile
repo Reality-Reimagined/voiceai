@@ -25,10 +25,8 @@ RUN pip install --no-cache-dir torch==2.1.0+cpu torchaudio==2.1.0+cpu --extra-in
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Clone and install F5-TTS
-RUN git clone --depth 1 https://github.com/SWivid/F5-TTS.git /app/F5-TTS && \
-    cd /app/F5-TTS && \
-    pip install --no-cache-dir .
+# Install F5-TTS directly from GitHub
+RUN pip install git+https://github.com/SWivid/F5-TTS.git
 
 # Copy application code
 COPY . .
