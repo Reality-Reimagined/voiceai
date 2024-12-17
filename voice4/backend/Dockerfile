@@ -1,8 +1,8 @@
-# Use the official lightweight Python image
+# Use official Python image
 FROM python:3.10-slim
 
-# Set the working directory
-WORKDIR /app
+# Set working directory to /app/backend
+WORKDIR /app/backend
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -13,20 +13,34 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy the requirements file
+# Create a virtual environment
+RUN python -m venv venv
+
+# Activate venv and upgrade pip
+RUN . venv/bin/activate && pip install --upgrade pip
+
+# Copy only requirements.txt first for caching
 COPY requirements.txt .
 
-# Install Python dependencies
-RUN pip install --upgrade pip && pip install -r requirements.txt
+# Install Python dependencies in venv
+RUN . venv/bin/activate && pip install -r requirements.txt
 
-# Copy the entire app source code
+# Copy the entire app
 COPY . .
 
-# Expose the API port
+# Install F5-TTS from source
+RUN git clone https://github.com/SWivid/F5-TTS.git && \
+    cd F5-TTS && . ../venv/bin/activate && pip install -e .
+
+# Add venv to PATH
+ENV PATH="/app/backend/venv/bin:$PATH"
+
+# Expose the port
 EXPOSE 8000
 
-# Run the FastAPI app
+# Run the app
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+
 
 
 
