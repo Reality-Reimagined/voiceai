@@ -27,8 +27,12 @@ COPY requirements.txt .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Clone the F5-TTS repository
+# Clone the F5-TTS repository as the root user
+USER root
 RUN git clone https://github.com/SWivid/F5-TTS.git /app/F5-TTS
+
+# Switch back to the non-root user
+USER appuser
 
 # Set the working directory to the F5-TTS directory
 WORKDIR /app/F5-TTS
@@ -46,6 +50,9 @@ COPY . .
 # Create necessary directories
 RUN mkdir -p /app/voice_configs
 
+# Add local bin to PATH
+ENV PATH="/home/appuser/.local/bin:${PATH}"
+
 # Set Python path to include F5-TTS
 ENV PYTHONPATH="${PYTHONPATH}:/app/F5-TTS"
 
@@ -54,7 +61,6 @@ EXPOSE 8000
 
 # Start the application
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
-
 
 # FROM python:3.10-slim
 
