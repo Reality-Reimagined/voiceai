@@ -52,6 +52,7 @@ EXPOSE 8000
 
 # Start the application with multiple workers
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+
 # FROM python:3.10-slim
 
 # WORKDIR /app
