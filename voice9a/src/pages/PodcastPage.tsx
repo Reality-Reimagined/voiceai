@@ -142,48 +142,141 @@ const generateScript = async () => {
   }
 };
 
-  const handleCreatePodcast = async () => {
-    if (!script || !mainVoice || !townVoice || !countryVoice) {
-      toast({
-        title: 'Error',
-        description: 'Please fill in all required fields',
-        variant: 'destructive',
-      });
-      return;
+//     const handleCreatePodcast = async () => {
+//   if (!script || !mainVoice || !townVoice || !countryVoice) {
+//     toast({
+//       title: 'Error',
+//       description: 'Please fill in all required fields',
+//       variant: 'destructive',
+//     });
+//     return;
+//   }
+
+//   setLoading(true);
+//   try {
+//     // Generate voice files based on voice selections
+//     const mainFile = new File([], 'main.flac');
+//     const townFile = new File([], 'town.flac');
+//     const countryFile = new File([], 'country.flac');
+
+//     const podcastResult = await createPodcast(
+//       script,
+//       mainFile,
+//       townFile,
+//       countryFile
+//     );
+
+//     if (!podcastResult) {
+//       throw new Error('Podcast creation failed.');
+//     }
+
+//     const audioBlob = await getAudioFile(podcastResult.output_file);
+//     const url = URL.createObjectURL(audioBlob);
+//     setPodcastUrl(url);
+
+//     toast({
+//       title: 'Success',
+//       description: 'Podcast created successfully!',
+//     });
+//   } catch (error) {
+//     toast({
+//       title: 'Error',
+//       description: error instanceof Error ? error.message : 'Failed to create podcast',
+//       variant: 'destructive',
+//     });
+//   } finally {
+//     setLoading(false);
+//   }
+// };
+const handleCreatePodcast = async () => {
+  if (!script || !mainVoice || !townVoice || !countryVoice) {
+    toast({
+      title: 'Error',
+      description: 'Please fill in all required fields',
+      variant: 'destructive',
+    });
+    return;
+  }
+
+  setLoading(true);
+  try {
+    // Generate voice files based on voice selections
+    const mainFile = new File([], 'main.flac');
+    const townFile = new File([], 'town.flac');
+    const countryFile = new File([], 'country.flac');
+
+    const podcastResult = await createPodcast(
+      script,
+      mainFile,
+      townFile,
+      countryFile
+    );
+
+    if (!podcastResult) {
+      throw new Error('Podcast creation failed.');
     }
 
-    setLoading(true);
-    try {
-      // In a real implementation, you would get the actual voice files
-      const mainFile = new File([], 'main.flac');
-      const townFile = new File([], 'town.flac');
-      const countryFile = new File([], 'country.flac');
+    const audioBlob = await getAudioFile(podcastResult.output_file);
+    const url = URL.createObjectURL(audioBlob);
+    setPodcastUrl(url);
 
-      const { output_file } = await createPodcast(
-        script,
-        mainFile,
-        townFile,
-        countryFile
-      );
+    toast({
+      title: 'Success',
+      description: 'Podcast created successfully!',
+    });
+  } catch (error) {
+    toast({
+      title: 'Error',
+      description: error instanceof Error ? error.message : 'Failed to create podcast',
+      variant: 'destructive',
+    });
+  } finally {
+    setLoading(false);
+  }
+};
 
-      const audioBlob = await getAudioFile(output_file);
-      const url = URL.createObjectURL(audioBlob);
-      setPodcastUrl(url);
+  // const handleCreatePodcast = async () => {
+  //   if (!script || !mainVoice || !townVoice || !countryVoice) {
+  //     toast({
+  //       title: 'Error',
+  //       description: 'Please fill in all required fields',
+  //       variant: 'destructive',
+  //     });
+  //     return;
+  //   }
 
-      toast({
-        title: 'Success',
-        description: 'Podcast created successfully!',
-      });
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to create podcast',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+  //   setLoading(true);
+  //   try {
+  //     // In a real implementation, you would get the actual voice files
+  //     const mainFile = new File([], 'main.flac');
+  //     const townFile = new File([], 'town.flac');
+  //     const countryFile = new File([], 'country.flac');
+
+  //     const { output_file } = await createPodcast(
+  //       script,
+  //       mainFile,
+  //       townFile,
+  //       countryFile
+  //     );
+      
+  //     const audioBlob = await getAudioFile(output_file);
+  //     const url = URL.createObjectURL(audioBlob);
+  //     setPodcastUrl(url);
+
+  //     toast({
+  //       title: 'Success',
+  //       description: 'Podcast created successfully!',
+  //     });
+  //   } catch (error) {
+  //     toast({
+  //       title: 'Error',
+  //       description: error instanceof Error ? error.message : 'Failed to create podcast',
+  //       variant: 'destructive',
+  //     });
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const handleDownload = () => {
     if (podcastUrl) {
