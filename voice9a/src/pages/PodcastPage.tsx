@@ -1,20 +1,39 @@
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { ScriptEditor } from '@/components/podcast/ScriptEditor';
 import { VoiceSelector } from '@/components/podcast/VoiceSelector';
 import { AudioPlayer } from '@/components/text-to-speech/AudioPlayer';
-import { createPodcast, getAudioFile } from '@/lib/api';
+import { createPodcast } from '@/lib/api';
 import { Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/lib/supabase';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { generateWithLLM } from '@/lib/llm';
 import { PODCAST_PROMPT } from '@/lib/config';
+
+
+// import { useState } from 'react';
+// import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+// import { Button } from '@/components/ui/button';
+// import { useToast } from '@/components/ui/use-toast';
+// import { ScriptEditor } from '@/components/podcast/ScriptEditor';
+// import { VoiceSelector } from '@/components/podcast/VoiceSelector';
+// import { AudioPlayer } from '@/components/text-to-speech/AudioPlayer';
+// import { createPodcast, getAudioFile } from '@/lib/api';
+// import { Loader2 } from 'lucide-react';
+// import { Input } from '@/components/ui/input';
+// import { Label } from '@/components/ui/label';
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+// import { supabase } from '@/lib/supabase';
+// import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+// import { Textarea } from '@/components/ui/textarea';
+// import { generateWithLLM } from '@/lib/llm';
+// import { PODCAST_PROMPT } from '@/lib/config';
 
 const AVAILABLE_VOICES = [
   { id: 'voice1', name: 'Main Voice' },
