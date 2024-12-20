@@ -1,3 +1,145 @@
+// // import { useState } from 'react';
+// // import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+// // import { Button } from '@/components/ui/button';
+// // import { useToast } from '@/components/ui/use-toast';
+// // import { ScriptEditor } from '@/components/podcast/ScriptEditor';
+// // import { VoiceSelector } from '@/components/podcast/VoiceSelector';
+// // import { AudioPlayer } from '@/components/text-to-speech/AudioPlayer';
+// // import { createPodcast, getAudioFile } from '@/lib/api';
+// // import { Loader2 } from 'lucide-react';
+// // import { Input } from '@/components/ui/input';
+// // import { Label } from '@/components/ui/label';
+// // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+// // import { supabase } from '@/lib/supabase';
+// // import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+// // import { Textarea } from '@/components/ui/textarea';
+// // import { generateWithLLM } from '@/lib/llm';
+// // import { PODCAST_PROMPT } from '@/lib/config';
+
+// // const AVAILABLE_VOICES = [
+// //   { id: 'voice1', name: 'Main Voice' },
+// //   { id: 'voice2', name: 'Town Voice' },
+// //   { id: 'voice3', name: 'Country Voice' },
+// // ];
+
+// // const LLM_PROVIDERS = [
+// //   { id: 'openai', name: 'OpenAI' },
+// //   { id: 'groq', name: 'Groq' },
+// //   { id: 'together', name: 'Together.ai' },
+// //   { id: 'gemini', name: 'Google Gemini' },
+// // ];
+
+// // const MODELS = {
+// //   openai: ['gpt-4', 'gpt-3.5-turbo'],
+// //   groq: ['mixtral-8x7b-32768', 'llama2-70b-4096'],
+// //   together: ['mistral-7b-instruct', 'llama2-70b'],
+// //   gemini: ['gemini-pro'],
+// // };
+
+// // export function PodcastPage() {
+// //   const [topic, setTopic] = useState('');
+// //   const [podcastName, setPodcastName] = useState('');
+// //   const [provider, setProvider] = useState('');
+// //   const [model, setModel] = useState('');
+// //   const [script, setScript] = useState('');
+// //   const [mainVoice, setMainVoice] = useState('');
+// //   const [townVoice, setTownVoice] = useState('');
+// //   const [countryVoice, setCountryVoice] = useState('');
+// //   const [podcastUrl, setPodcastUrl] = useState<string | null>(null);
+// //   const [loading, setLoading] = useState(false);
+// //   const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
+// //   const [apiKey, setApiKey] = useState('');
+// //   const { toast } = useToast();
+
+// //   const checkApiKey = async (provider: string) => {
+// //     const { data } = await supabase
+// //       .from('api_keys')
+// //       .select('key')
+// //       .eq('provider', provider)
+// //       .single();
+// //     return !!data?.key;
+// //   };
+
+// //   const saveApiKey = async () => {
+// //     try {
+// //       const { error } = await supabase
+// //         .from('api_keys')
+// //         .upsert({ provider, key: apiKey });
+// //       if (error) throw error;
+// //       setShowApiKeyDialog(false);
+// //       toast({ title: 'Success', description: 'API key saved successfully' });
+// //     } catch (error) {
+// //       toast({ title: 'Error', description: 'Failed to save API key', variant: 'destructive' });
+// //     }
+// //   };
+
+// //   const handleProviderChange = async (value: string) => {
+// //     setProvider(value);
+// //     setModel('');
+// //     const hasKey = await checkApiKey(value);
+// //     if (!hasKey) setShowApiKeyDialog(true);
+// //   };
+
+// //   const generateScript = async () => {
+// //     if (!topic || !provider || !model || !podcastName) {
+// //       toast({ title: 'Error', description: 'Please fill in all required fields', variant: 'destructive' });
+// //       return;
+// //     }
+// //     setLoading(true);
+// //     try {
+// //       const { data } = await supabase
+// //         .from('api_keys')
+// //         .select('key')
+// //         .eq('provider', provider)
+// //         .single();
+// //       const key = data?.key;
+// //       if (!key) throw new Error('API key not found');
+// //       const prompt = PODCAST_PROMPT(podcastName, topic);
+// //       const result = await generateWithLLM(prompt, provider, model, key);
+// //       if (result.error) throw new Error(result.error);
+// //       setScript(result.script);
+// //       toast({ title: 'Success', description: 'Script generated successfully!' });
+// //     } catch (error) {
+// //       toast({ title: 'Error', description: error instanceof Error ? error.message : 'Failed to generate script', variant: 'destructive' });
+// //     } finally {
+// //       setLoading(false);
+// //     }
+// //   };
+
+// //   const handleCreatePodcast = async () => {
+// //     if (!script || !mainVoice || !townVoice || !countryVoice) {
+// //       toast({ title: 'Error', description: 'Please fill in all required fields', variant: 'destructive' });
+// //       return;
+// //     }
+// //     setLoading(true);
+// //     try {
+// //       const mainFile = new File([], 'main.flac');
+// //       const townFile = new File([], 'town.flac');
+// //       const countryFile = new File([], 'country.flac');
+// //       const podcastResult = await createPodcast(script, mainFile, townFile, countryFile);
+// //       if (!podcastResult) throw new Error('Podcast creation failed.');
+// //       const audioBlob = await getAudioFile(podcastResult.output_file);
+// //       const url = URL.createObjectURL(audioBlob);
+// //       setPodcastUrl(url);
+// //       toast({ title: 'Success', description: 'Podcast created successfully!' });
+// //     } catch (error) {
+// //       toast({ title: 'Error', description: error instanceof Error ? error.message : 'Failed to create podcast', variant: 'destructive' });
+// //     } finally {
+// //       setLoading(false);
+// //     }
+// //   };
+
+// //   const handleDownload = () => {
+// //     if (podcastUrl) {
+// //       const a = document.createElement('a');
+// //       a.href = podcastUrl;
+// //       a.download = 'podcast.mp3';
+// //       document.body.appendChild(a);
+// //       a.click();
+// //       document.body.removeChild(a);
+// //     }
+// //   };
+
 // import { useState } from 'react';
 // import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 // import { Button } from '@/components/ui/button';
@@ -106,6 +248,31 @@
 //     }
 //   };
 
+//   // const handleCreatePodcast = async () => {
+//   //   if (!script || !mainVoice || !townVoice || !countryVoice) {
+//   //     toast({ title: 'Error', description: 'Please fill in all required fields', variant: 'destructive' });
+//   //     return;
+//   //   }
+//   //   setLoading(true);
+//   //   try {
+//   //     const mainFile = new File([], 'main.flac');
+//   //     const townFile = new File([], 'town.flac');
+//   //     const countryFile = new File([], 'country.flac');
+//   //     const podcastResult = await createPodcast(script, mainFile, townFile, countryFile);
+//   //     if (!('output_file' in podcastResult)) {
+//   //       throw new Error('Podcast creation failed. Missing output file.');
+//   //     }
+//   //     const audioBlob = await getAudioFile(podcastResult.output_file);
+//   //     const url = URL.createObjectURL(audioBlob);
+//   //     setPodcastUrl(url);
+//   //     toast({ title: 'Success', description: 'Podcast created successfully!' });
+//   //   } catch (error) {
+//   //     toast({ title: 'Error', description: error instanceof Error ? error.message : 'Failed to create podcast', variant: 'destructive' });
+//   //   } finally {
+//   //     setLoading(false);
+//   //   }
+//   // };
+
 //   const handleCreatePodcast = async () => {
 //     if (!script || !mainVoice || !townVoice || !countryVoice) {
 //       toast({ title: 'Error', description: 'Please fill in all required fields', variant: 'destructive' });
@@ -116,9 +283,11 @@
 //       const mainFile = new File([], 'main.flac');
 //       const townFile = new File([], 'town.flac');
 //       const countryFile = new File([], 'country.flac');
-//       const podcastResult = await createPodcast(script, mainFile, townFile, countryFile);
-//       if (!podcastResult) throw new Error('Podcast creation failed.');
-//       const audioBlob = await getAudioFile(podcastResult.output_file);
+//       const podcastResult: { output_file: string } = await createPodcast(script, mainFile, townFile, countryFile);
+//       if (!('output_file' in podcastResult)) {
+//         throw new Error('Podcast creation failed. Missing output file.');
+//       }
+//       const audioBlob = await getAudioFile(podcastResult.output_file as string);
 //       const url = URL.createObjectURL(audioBlob);
 //       setPodcastUrl(url);
 //       toast({ title: 'Success', description: 'Podcast created successfully!' });
@@ -139,7 +308,6 @@
 //       document.body.removeChild(a);
 //     }
 //   };
-
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -223,92 +391,89 @@ export function PodcastPage() {
   };
 
   const generateScript = async () => {
-    if (!topic || !provider || !model || !podcastName) {
-      toast({ title: 'Error', description: 'Please fill in all required fields', variant: 'destructive' });
-      return;
-    }
-    setLoading(true);
-    try {
-      const { data } = await supabase
-        .from('api_keys')
-        .select('key')
-        .eq('provider', provider)
-        .single();
-      const key = data?.key;
-      if (!key) throw new Error('API key not found');
-      const prompt = PODCAST_PROMPT(podcastName, topic);
-      const result = await generateWithLLM(prompt, provider, model, key);
-      if (result.error) throw new Error(result.error);
-      setScript(result.script);
-      toast({ title: 'Success', description: 'Script generated successfully!' });
-    } catch (error) {
-      toast({ title: 'Error', description: error instanceof Error ? error.message : 'Failed to generate script', variant: 'destructive' });
-    } finally {
-      setLoading(false);
-    }
-  };
+  if (!topic || !provider || !model || !podcastName) {
+    toast({ title: 'Error', description: 'Please fill in all required fields', variant: 'destructive' });
+    return;
+  }
+  setLoading(true);
+  try {
+    const { data } = await supabase
+      .from('api_keys')
+      .select('key')
+      .eq('provider', provider)
+      .single();
+    const key = data?.key;
+    if (!key) throw new Error('API key not found');
 
-  // const handleCreatePodcast = async () => {
-  //   if (!script || !mainVoice || !townVoice || !countryVoice) {
-  //     toast({ title: 'Error', description: 'Please fill in all required fields', variant: 'destructive' });
-  //     return;
-  //   }
-  //   setLoading(true);
-  //   try {
-  //     const mainFile = new File([], 'main.flac');
-  //     const townFile = new File([], 'town.flac');
-  //     const countryFile = new File([], 'country.flac');
-  //     const podcastResult = await createPodcast(script, mainFile, townFile, countryFile);
-  //     if (!('output_file' in podcastResult)) {
-  //       throw new Error('Podcast creation failed. Missing output file.');
-  //     }
-  //     const audioBlob = await getAudioFile(podcastResult.output_file);
-  //     const url = URL.createObjectURL(audioBlob);
-  //     setPodcastUrl(url);
-  //     toast({ title: 'Success', description: 'Podcast created successfully!' });
-  //   } catch (error) {
-  //     toast({ title: 'Error', description: error instanceof Error ? error.message : 'Failed to create podcast', variant: 'destructive' });
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+    const prompt = PODCAST_PROMPT(podcastName, topic);
+    const result = await generateWithLLM(prompt, provider, model, key);
+    if (result.error) throw new Error(result.error);
+
+    setScript(result.script);
+    toast({ title: 'Success', description: 'Script generated successfully!' });
+  } catch (error) {
+    toast({ title: 'Error', description: error instanceof Error ? error.message : 'Failed to generate script', variant: 'destructive' });
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleCreatePodcast = async () => {
-    if (!script || !mainVoice || !townVoice || !countryVoice) {
-      toast({ title: 'Error', description: 'Please fill in all required fields', variant: 'destructive' });
-      return;
+  if (!script || !mainVoice || !townVoice || !countryVoice) {
+    toast({ title: 'Error', description: 'Please fill in all required fields', variant: 'destructive' });
+    return;
+  }
+  setLoading(true);
+  try {
+    const formData = new FormData();
+    formData.append('script', new Blob([script], { type: 'text/plain' }));
+    formData.append('main', new File([], 'main.flac'));
+    formData.append('town', new File([], 'town.flac'));
+    formData.append('country', new File([], 'country.flac'));
+
+    const response = await fetch('/podcast/', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error('Podcast creation failed.');
     }
-    setLoading(true);
-    try {
-      const mainFile = new File([], 'main.flac');
-      const townFile = new File([], 'town.flac');
-      const countryFile = new File([], 'country.flac');
-      const podcastResult: { output_file: string } = await createPodcast(script, mainFile, townFile, countryFile);
-      if (!('output_file' in podcastResult)) {
-        throw new Error('Podcast creation failed. Missing output file.');
-      }
-      const audioBlob = await getAudioFile(podcastResult.output_file as string);
-      const url = URL.createObjectURL(audioBlob);
-      setPodcastUrl(url);
-      toast({ title: 'Success', description: 'Podcast created successfully!' });
-    } catch (error) {
-      toast({ title: 'Error', description: error instanceof Error ? error.message : 'Failed to create podcast', variant: 'destructive' });
-    } finally {
-      setLoading(false);
+
+    const result = await response.json();
+    const podcastName = result.output_file;
+
+    if (!podcastName) {
+      throw new Error('No output file returned.');
     }
-  };
+
+    const downloadResponse = await fetch(`/audio/${podcastName}`);
+    if (!downloadResponse.ok) {
+      throw new Error('Failed to fetch the podcast audio.');
+    }
+
+    const audioBlob = await downloadResponse.blob();
+    const url = URL.createObjectURL(audioBlob);
+    setPodcastUrl(url);
+
+    toast({ title: 'Success', description: 'Podcast created successfully!' });
+  } catch (error) {
+    toast({ title: 'Error', description: error instanceof Error ? error.message : 'Failed to create podcast', variant: 'destructive' });
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleDownload = () => {
     if (podcastUrl) {
       const a = document.createElement('a');
       a.href = podcastUrl;
-      a.download = 'podcast.mp3';
+      a.download = podcastUrl.split('/').pop() || 'podcast.wav';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
     }
   };
-
   
   return (
       <div className="container max-w-4xl py-8">
