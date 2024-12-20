@@ -9,21 +9,9 @@ interface UsageData {
 }
 
 interface UsageLimits {
-  free: {
-    'text-to-speech': number;
-    'voice-clone': number;
-    podcast: number;
-  };
-  pro: {
-    'text-to-speech': number;
-    'voice-clone': number;
-    podcast: number;
-  };
-  enterprise: {
-    'text-to-speech': number;
-    'voice-clone': number;
-    podcast: number;
-  };
+  free: Record<string, number>;
+  pro: Record<string, number>;
+  enterprise: Record<string, number>;
 }
 
 export function useUsage() {
@@ -73,16 +61,18 @@ export function useUsage() {
         const planId = subscription?.plan_id as keyof UsageLimits;
         const planLimits = limits[planId || 'free'];
 
-        const usageMap = usageData?.reduce((acc, curr) => {
-          acc[curr.feature] = {
-            feature: curr.feature,
-            count: curr.count,
-            limit: planLimits[curr.feature],
-          };
-          return acc;
-        }, {} as Record<string, UsageData>);
+        const usageMap: Record<string, UsageData> = {};
+        usageData?.forEach(curr => {
+          if (curr.feature in planLimits) {
+            usageMap[curr.feature] = {
+              feature: curr.feature,
+              count: curr.count,
+              limit: planLimits[curr.feature],
+            };
+          }
+        });
 
-        setUsage(usageMap || {});
+        setUsage(usageMap);
       } catch (err) {
         setError(err instanceof Error ? err : new Error('Failed to fetch usage'));
       } finally {
@@ -111,9 +101,13 @@ export function useUsage() {
     };
   }, [user]);
 
-  return { usage, loading, error };
-}
+  const getUsagePercentage = (feature: string): number => {
+    const data = usage[feature];
+    return data ? (data.count / data.limit) * 100 : 0;
+  };
 
+  return { usage, loading, error, getUsagePercentage };
+}
 
 
 
