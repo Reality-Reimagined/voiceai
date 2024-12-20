@@ -24,29 +24,74 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-export const synthesizeText = async (text: string) => {
-  try {
-    const synthesisResponse = await apiClient.post('/synthesize/', { text });
-    
-    if (!synthesisResponse.data?.output_file) {
-      throw new Error('No output file received');
-    }
+/**
+ * Synthesizes text into speech by sending a POST request to the /synthesize/ endpoint.
+ * Fetches the generated audio file from the /audio/{output_file} endpoint.
+ */
 
-    const audioResponse = await apiClient.get(`/audio/${synthesisResponse.data.output_file}`, {
-      responseType: 'blob'
+export async function synthesizeText(text: string): Promise<string> {
+  try {
+    // Step 1: Send text to /synthesize/ endpoint
+    const response = await fetch('https://f5-tts-service-157176978845.us-central1.run.app/synthesize/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ text }),
     });
 
-    return {
-      audioBlob: new Blob([audioResponse.data], { type: 'audio/wav' }),
-      fileName: synthesisResponse.data.output_file
-    };
-  } catch (error) {
-    if (axios.isAxiosError(error)) {
-      throw new Error(error.response?.data?.message || 'Failed to synthesize text');
+    if (!response.ok) {
+      throw new Error('Failed to synthesize speech');
     }
+
+    const result = await response.json();
+
+    if (!result.output_file) {
+      throw new Error('No output file returned from the server');
+    }
+
+    const outputFile = result.output_file;
+
+    // Step 2: Fetch the audio file from /audio/{output_file}
+    const audioResponse = await fetch(`https://f5-tts-service-157176978845.us-central1.run.app/audio/${outputFile}`);
+
+    if (!audioResponse.ok) {
+      throw new Error('Failed to fetch the audio file');
+    }
+
+    const audioBlob = await audioResponse.blob();
+    const audioUrl = URL.createObjectURL(audioBlob);
+
+    return audioUrl; // Return the URL for playback or download
+  } catch (error) {
+    console.error('Error synthesizing text:', error);
     throw error;
   }
-};
+}
+
+// export const synthesizeText = async (text: string) => {
+//   try {
+//     const synthesisResponse = await apiClient.post('/synthesize/', { text });
+    
+//     if (!synthesisResponse.data?.output_file) {
+//       throw new Error('No output file received');
+//     }
+
+//     const audioResponse = await apiClient.get(`/audio/${synthesisResponse.data.output_file}`, {
+//       responseType: 'blob'
+//     });
+
+//     return {
+//       audioBlob: new Blob([audioResponse.data], { type: 'audio/wav' }),
+//       fileName: synthesisResponse.data.output_file
+//     };
+//   } catch (error) {
+//     if (axios.isAxiosError(error)) {
+//       throw new Error(error.response?.data?.message || 'Failed to synthesize text');
+//     }
+//     throw error;
+//   }
+// };
 
 export const createPodcast = async (scriptContent: string, mainVoice: File, townVoice: File, countryVoice: File) => {
   try {
