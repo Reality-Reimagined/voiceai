@@ -6,7 +6,7 @@ import { TextInput } from '@/components/text-to-speech/TextInput';
 import { AudioPlayer } from '@/components/text-to-speech/AudioPlayer';
 import { synthesizeText, getAudioFile } from '@/lib/api';
 import { Loader2 } from 'lucide-react';
-import type { ApiResponse } from '@/types';
+// import type { ApiResponse } from '@/types';
 
 export function TextToSpeechPage() {
   const [text, setText] = useState('');
