@@ -248,6 +248,31 @@ export function PodcastPage() {
     }
   };
 
+  // const handleCreatePodcast = async () => {
+  //   if (!script || !mainVoice || !townVoice || !countryVoice) {
+  //     toast({ title: 'Error', description: 'Please fill in all required fields', variant: 'destructive' });
+  //     return;
+  //   }
+  //   setLoading(true);
+  //   try {
+  //     const mainFile = new File([], 'main.flac');
+  //     const townFile = new File([], 'town.flac');
+  //     const countryFile = new File([], 'country.flac');
+  //     const podcastResult = await createPodcast(script, mainFile, townFile, countryFile);
+  //     if (!('output_file' in podcastResult)) {
+  //       throw new Error('Podcast creation failed. Missing output file.');
+  //     }
+  //     const audioBlob = await getAudioFile(podcastResult.output_file);
+  //     const url = URL.createObjectURL(audioBlob);
+  //     setPodcastUrl(url);
+  //     toast({ title: 'Success', description: 'Podcast created successfully!' });
+  //   } catch (error) {
+  //     toast({ title: 'Error', description: error instanceof Error ? error.message : 'Failed to create podcast', variant: 'destructive' });
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleCreatePodcast = async () => {
     if (!script || !mainVoice || !townVoice || !countryVoice) {
       toast({ title: 'Error', description: 'Please fill in all required fields', variant: 'destructive' });
@@ -258,11 +283,11 @@ export function PodcastPage() {
       const mainFile = new File([], 'main.flac');
       const townFile = new File([], 'town.flac');
       const countryFile = new File([], 'country.flac');
-      const podcastResult = await createPodcast(script, mainFile, townFile, countryFile);
+      const podcastResult: { output_file: string } = await createPodcast(script, mainFile, townFile, countryFile);
       if (!('output_file' in podcastResult)) {
         throw new Error('Podcast creation failed. Missing output file.');
       }
-      const audioBlob = await getAudioFile(podcastResult.output_file);
+      const audioBlob = await getAudioFile(podcastResult.output_file as string);
       const url = URL.createObjectURL(audioBlob);
       setPodcastUrl(url);
       toast({ title: 'Success', description: 'Podcast created successfully!' });
