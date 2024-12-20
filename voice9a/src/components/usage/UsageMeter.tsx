@@ -24,7 +24,8 @@ export function UsageMeter({ feature }: UsageMeterProps) {
       <Progress value={percentage} className="h-2" />
       
       {percentage >= 80 && (
-        <Alert variant="warning" className="mt-2">
+        // <Alert variant="warning" className="mt-2">
+        <Alert className="mt-2">
           <AlertDescription>
             You're approaching your usage limit. Consider upgrading your plan to continue using this feature.
           </AlertDescription>
