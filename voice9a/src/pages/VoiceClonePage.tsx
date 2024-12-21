@@ -87,7 +87,7 @@ export function VoiceClonePage() {
           {recordingUrl && (
             <div className="space-y-4">
               <h2 className="text-sm font-medium text-gray-700">Preview your recorded voice:</h2>
-              <AudioPlayer audioUrl={recordingUrl} />
+              <AudioPlayer audioUrl={recordingUrl} onDownload={() => {}} />
             </div>
           )}
 
@@ -128,6 +128,7 @@ export function VoiceClonePage() {
     </div>
   );
 }
+
 
 
 
