@@ -19,7 +19,7 @@ export function VoiceClonePage() {
   const [responseFileName, setResponseFileName] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const handleRecordingComplete = async (blob: Blob) => {
+  const handleRecordingComplete = (blob: Blob) => {
     setAudioBlob(blob);
     const url = URL.createObjectURL(blob);
     setRecordingUrl(url);
