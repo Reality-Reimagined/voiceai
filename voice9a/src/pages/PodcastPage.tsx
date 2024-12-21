@@ -70,14 +70,31 @@ export function PodcastPage() {
   const [apiKey, setApiKey] = useState('');
   const { toast } = useToast();
 
+
   const checkApiKey = async (provider: string) => {
-    const { data } = await supabase
-      .from('api_keys')
-      .select('key')
-      .eq('provider', provider)
-      .single();
-    return !!data?.key;
-  };
+  // Attempt to get the key from the environment first
+  const envKey = process.env[`API_KEY_${provider.toUpperCase()}`];
+  if (envKey) {
+    return true; // Key exists in environment variables
+  }
+
+  // Fallback to checking the database
+  const { data } = await supabase
+    .from('api_keys')
+    .select('key')
+    .eq('provider', provider)
+    .single();
+
+  return !!data?.key;
+};
+  // const checkApiKey = async (provider: string) => {
+  //   const { data } = await supabase
+  //     .from('api_keys')
+  //     .select('key')
+  //     .eq('provider', provider)
+  //     .single();
+  //   return !!data?.key;
+  // };
 
   const saveApiKey = async () => {
     try {
