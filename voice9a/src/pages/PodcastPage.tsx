@@ -71,22 +71,23 @@ export function PodcastPage() {
   const { toast } = useToast();
 
 
-  const checkApiKey = async (provider: string) => {
-  // Attempt to get the key from the environment first
-  const envKey = process.env[`API_KEY_${provider.toUpperCase()}`];
+const checkApiKey = async (provider: string): Promise<string | null> => {
+  // Check environment variable
+  const envKey = import.meta.env[`API_KEY_${provider.toUpperCase()}`];
   if (envKey) {
-    return true; // Key exists in environment variables
+    return envKey; // Return the key as a string
   }
 
-  // Fallback to checking the database
+  // Check database
   const { data } = await supabase
     .from('api_keys')
     .select('key')
     .eq('provider', provider)
     .single();
 
-  return !!data?.key;
+  return data?.key || null; // Return the key or null
 };
+
   // const checkApiKey = async (provider: string) => {
   //   const { data } = await supabase
   //     .from('api_keys')
@@ -109,12 +110,23 @@ export function PodcastPage() {
     }
   };
 
+  // const handleProviderChange = async (value: string) => {
+  //   setProvider(value);
+  //   setModel('');
+  //   const hasKey = await checkApiKey(value);
+  //   if (!hasKey) setShowApiKeyDialog(true);
+  // };
+
   const handleProviderChange = async (value: string) => {
     setProvider(value);
     setModel('');
-    const hasKey = await checkApiKey(value);
-    if (!hasKey) setShowApiKeyDialog(true);
+  
+    const key = await checkApiKey(value); // Corrected
+    if (!key) {
+      setShowApiKeyDialog(true); // Open dialog for manual input
+    }
   };
+
 
 //   const generateScript = async () => {
 //   if (!topic || !provider || !model || !podcastName) {
@@ -156,7 +168,7 @@ export function PodcastPage() {
 
     setLoading(true);
     try {
-      const key = await checkApiKey(provider);
+      const key = await checkApiKey(provider); // Corrected
       if (!key) {
         throw new Error('API key not found');
       }
