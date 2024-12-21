@@ -628,13 +628,14 @@ export function VoiceClonePage() {
 
           {audioBlob && !loading && (
             <div>
-              <label htmlFor="custom-text">What do you want to say with your new voice?</label>
-              <input
-                type="text"
-                id="custom-text"
-                value={customText}
-                onChange={(e) => setCustomText(e.target.value)}
-              />
+              <label htmlFor="custom-text" className="block text-sm font-medium text-gray-700">What do you want to say with your new voice?</label>
+              <textarea
+                  id="custom-text"
+                  rows={4} // Adjust the number of rows as needed
+                  className="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  value={customText}
+                  onChange={(e) => setCustomText(e.target.value)}
+                />
             </div>
           )}
         </CardContent>
