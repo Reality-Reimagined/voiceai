@@ -16,6 +16,7 @@ export function VoiceClonePage() {
   const [clonedAudioUrl, setClonedAudioUrl] = useState<string | null>(null);
   const [customText, setCustomText] = useState('');
   const [loading, setLoading] = useState(false);
+  const [responseFileName, setResponseFileName] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleRecordingComplete = async (blob: Blob) => {
@@ -39,6 +40,7 @@ export function VoiceClonePage() {
         throw new Error('No fileName returned from the server.');
       }
 
+      setResponseFileName(response.fileName);
       const clonedBlob = await getAudioFile(response.fileName);
       const url = URL.createObjectURL(clonedBlob);
       setClonedAudioUrl(url);
@@ -56,10 +58,10 @@ export function VoiceClonePage() {
   };
 
   const handleDownload = () => {
-    if (clonedAudioUrl) {
+    if (clonedAudioUrl && responseFileName) {
       const a = document.createElement('a');
       a.href = clonedAudioUrl;
-      a.download = 'cloned-voice.wav';
+      a.download = responseFileName; // Use the server-provided file name
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -67,7 +69,7 @@ export function VoiceClonePage() {
   };
 
   return (
-    <div className="container max-w-4xl py-8 space-y-8">
+    <div className="container max-w-4xl py-8">
       <Card>
         <CardHeader>
           <CardTitle>Voice Cloning</CardTitle>
@@ -126,7 +128,6 @@ export function VoiceClonePage() {
     </div>
   );
 }
-
 
 
 
