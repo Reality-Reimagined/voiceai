@@ -120,7 +120,8 @@ export function VoiceClonePage() {
             id="custom-text"
             label="What do you want to say with your new voice?"
             value={customText}
-            onChange={(e) => setCustomText(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setCustomText(e.target.value)}
+{/*             onChange={(e) => setCustomText(e.target.value)} */}
           />
 
           <Button onClick={handleCloneVoice} disabled={loading || !audioBlob}>
