@@ -136,8 +136,8 @@ export const createPodcast = async (scriptContent: string, mainVoice: File, town
 export const cloneVoice = async (audioFile: File, refText: string, customText: string) => {
   try {
     // Validate file type
-    if (audioFile.type !== 'audio/flac') {
-      throw new Error('Audio file must be a FLAC file');
+    if (audioFile.type !== 'audio/wav') {
+      throw new Error('Audio file must be a WAV file');
     }
     if (typeof refText !== 'string' || typeof customText !== 'string') {
       throw new Error('Ref text and custom text must be strings');
