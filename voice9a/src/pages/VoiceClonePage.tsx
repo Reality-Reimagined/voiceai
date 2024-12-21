@@ -8,22 +8,27 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const SAMPLE_TEXT = "The quick brown fox jumps over the lazy dog. I love technology and innovation. Voice cloning is an amazing advancement in artificial intelligence. This sample will help create a unique voice model that captures my speech patterns and tone.";
+const SAMPLE_TEXT = "The quick brown fox jumps over the lazy dog. I love technology and innovation. Voice cloning is an amazing advancement in artificial intelligence.";
 
 export function VoiceClonePage() {
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
   const [clonedAudioUrl, setClonedAudioUrl] = useState<string | null>(null);
   const [customText, setCustomText] = useState('');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-  let responseFileName: string | null = null;
 
   const handleRecordingComplete = async (blob: Blob) => {
     setAudioBlob(blob);
+    const url = URL.createObjectURL(blob);
+    setRecordingUrl(url);
   };
 
   const handleCloneVoice = async () => {
-    if (!audioBlob) return;
+    if (!audioBlob) {
+      toast({ title: 'Error', description: 'No audio recorded!', variant: 'destructive' });
+      return;
+    }
 
     setLoading(true);
     try {
@@ -31,18 +36,14 @@ export function VoiceClonePage() {
       const response = await cloneVoice(file, SAMPLE_TEXT, customText);
 
       if (!response.fileName) {
-        throw new Error('No fileName returned from the server');
+        throw new Error('No fileName returned from the server.');
       }
 
-      responseFileName = response.fileName;
       const clonedBlob = await getAudioFile(response.fileName);
       const url = URL.createObjectURL(clonedBlob);
       setClonedAudioUrl(url);
 
-      toast({
-        title: 'Success',
-        description: 'Voice cloned successfully!',
-      });
+      toast({ title: 'Success', description: 'Voice cloned successfully!' });
     } catch (error) {
       toast({
         title: 'Error',
@@ -55,10 +56,10 @@ export function VoiceClonePage() {
   };
 
   const handleDownload = () => {
-    if (clonedAudioUrl && responseFileName) {
+    if (clonedAudioUrl) {
       const a = document.createElement('a');
       a.href = clonedAudioUrl;
-      a.download = responseFileName; // Use the server-provided file name
+      a.download = 'cloned-voice.wav';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -66,7 +67,7 @@ export function VoiceClonePage() {
   };
 
   return (
-    <div className="container max-w-4xl py-8">
+    <div className="container max-w-4xl py-8 space-y-8">
       <Card>
         <CardHeader>
           <CardTitle>Voice Cloning</CardTitle>
@@ -81,6 +82,13 @@ export function VoiceClonePage() {
 
           <AudioRecorder onRecordingComplete={handleRecordingComplete} />
 
+          {recordingUrl && (
+            <div className="space-y-4">
+              <h2 className="text-sm font-medium text-gray-700">Preview your recorded voice:</h2>
+              <AudioPlayer audioUrl={recordingUrl} />
+            </div>
+          )}
+
           {loading && (
             <div className="flex items-center justify-center">
               <Loader2 className="h-8 w-8 animate-spin" />
@@ -89,27 +97,28 @@ export function VoiceClonePage() {
           )}
 
           {clonedAudioUrl && !loading && (
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium">Preview cloned voice:</span>
-              <div className="flex items-center space-x-4">
-                <AudioPlayer audioUrl={clonedAudioUrl} onDownload={handleDownload} />
-                <Button onClick={handleCloneVoice} disabled={loading}>Clone Again</Button>
-              </div>
+            <div className="space-y-4">
+              <h2 className="text-sm font-medium text-gray-700">Preview cloned voice:</h2>
+              <AudioPlayer audioUrl={clonedAudioUrl} onDownload={handleDownload} />
             </div>
           )}
 
           {audioBlob && !loading && (
-            <div className="space-y-2">
+            <div className="space-y-4">
               <label htmlFor="custom-text" className="block text-sm font-medium text-gray-700">
                 What do you want to say with your new voice?
               </label>
-              <input
-                type="text"
+              <textarea
                 id="custom-text"
+                rows={4}
                 className="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 value={customText}
                 onChange={(e) => setCustomText(e.target.value)}
               />
+              <Button onClick={handleCloneVoice} disabled={loading}>
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Clone Voice
+              </Button>
             </div>
           )}
         </CardContent>
@@ -119,7 +128,10 @@ export function VoiceClonePage() {
 }
 
 
-// import { useState } from 'react'; // Removed unnecessary React import
+
+
+// // deployed but missing alot/ 
+// import { useState } from 'react';
 // import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 // import { useToast } from '@/components/ui/use-toast';
 // import { AudioRecorder } from '@/components/voice-clone/AudioRecorder';
@@ -129,9 +141,7 @@ export function VoiceClonePage() {
 // import { Loader2 } from 'lucide-react';
 // import { Button } from '@/components/ui/button';
 
-// // Sample text for the voice cloning prompt
-// const SAMPLE_TEXT =
-//   'The quick brown fox jumps over the lazy dog. I love technology and innovation. Voice cloning is an amazing advancement in artificial intelligence. This sample will help create a unique voice model that captures my speech patterns and tone.';
+// const SAMPLE_TEXT = "The quick brown fox jumps over the lazy dog. I love technology and innovation. Voice cloning is an amazing advancement in artificial intelligence. This sample will help create a unique voice model that captures my speech patterns and tone.";
 
 // export function VoiceClonePage() {
 //   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
@@ -139,13 +149,12 @@ export function VoiceClonePage() {
 //   const [customText, setCustomText] = useState('');
 //   const [loading, setLoading] = useState(false);
 //   const { toast } = useToast();
+//   let responseFileName: string | null = null;
 
-//   // Handle recording completion
-//   const handleRecordingComplete = (blob: Blob) => {
+//   const handleRecordingComplete = async (blob: Blob) => {
 //     setAudioBlob(blob);
 //   };
 
-//   // Handle voice cloning
 //   const handleCloneVoice = async () => {
 //     if (!audioBlob) return;
 
@@ -154,14 +163,12 @@ export function VoiceClonePage() {
 //       const file = new File([audioBlob], 'sample.wav', { type: 'audio/wav' });
 //       const response = await cloneVoice(file, SAMPLE_TEXT, customText);
 
-//       // Validate the response to ensure it has the `output_file` property
-//       const outputFile = response.output_file;
-//       if (!outputFile) {
-//         throw new Error('No output file returned from the server');
+//       if (!response.fileName) {
+//         throw new Error('No fileName returned from the server');
 //       }
 
-//       // Fetch the cloned audio file
-//       const clonedBlob = await getAudioFile(outputFile);
+//       responseFileName = response.fileName;
+//       const clonedBlob = await getAudioFile(response.fileName);
 //       const url = URL.createObjectURL(clonedBlob);
 //       setClonedAudioUrl(url);
 
@@ -180,12 +187,11 @@ export function VoiceClonePage() {
 //     }
 //   };
 
-//   // Handle file download
 //   const handleDownload = () => {
-//     if (clonedAudioUrl) {
+//     if (clonedAudioUrl && responseFileName) {
 //       const a = document.createElement('a');
 //       a.href = clonedAudioUrl;
-//       a.download = 'cloned-voice.wav';
+//       a.download = responseFileName; // Use the server-provided file name
 //       document.body.appendChild(a);
 //       a.click();
 //       document.body.removeChild(a);
@@ -218,26 +224,25 @@ export function VoiceClonePage() {
 //           {clonedAudioUrl && !loading && (
 //             <div className="flex items-center justify-between">
 //               <span className="text-sm font-medium">Preview cloned voice:</span>
-//               <AudioPlayer audioUrl={clonedAudioUrl} onDownload={handleDownload} />
+//               <div className="flex items-center space-x-4">
+//                 <AudioPlayer audioUrl={clonedAudioUrl} onDownload={handleDownload} />
+//                 <Button onClick={handleCloneVoice} disabled={loading}>Clone Again</Button>
+//               </div>
 //             </div>
 //           )}
 
 //           {audioBlob && !loading && (
-//             <div className="mt-4 space-y-2">
-//               <label htmlFor="custom-text" className="block font-medium">
+//             <div className="space-y-2">
+//               <label htmlFor="custom-text" className="block text-sm font-medium text-gray-700">
 //                 What do you want to say with your new voice?
 //               </label>
-//               <textarea
+//               <input
+//                 type="text"
 //                 id="custom-text"
+//                 className="block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
 //                 value={customText}
 //                 onChange={(e) => setCustomText(e.target.value)}
-//                 className="w-full p-2 border rounded-md"
-//                 placeholder="Type your text here..."
-//                 rows={3}
-//               ></textarea>
-//               <Button onClick={handleCloneVoice} disabled={loading} className="mt-2">
-//                 {loading ? 'Cloning Voice...' : 'Clone Voice'}
-//               </Button>
+//               />
 //             </div>
 //           )}
 //         </CardContent>
