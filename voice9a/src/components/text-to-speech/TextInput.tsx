@@ -9,7 +9,7 @@ interface TextInputProps {
 
 export function TextInput({ onTextChange, disabled }: TextInputProps) {
   const [text, setText] = useState('');
-  const MAX_CHARS = 500;
+  const MAX_CHARS = 15000;
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newText = e.target.value.slice(0, MAX_CHARS);
