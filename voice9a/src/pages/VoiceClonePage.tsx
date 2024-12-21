@@ -1,4 +1,4 @@
-// import { useState } from 'react';
+import React, { useState } from 'react'; // Importing React and useState correctly
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
 import { AudioRecorder } from '@/components/voice-clone/AudioRecorder';
@@ -8,20 +8,23 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
+// Sample text for the voice cloning prompt
 const SAMPLE_TEXT =
   'The quick brown fox jumps over the lazy dog. I love technology and innovation. Voice cloning is an amazing advancement in artificial intelligence. This sample will help create a unique voice model that captures my speech patterns and tone.';
 
 export function VoiceClonePage() {
-  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
-  const [clonedAudioUrl, setClonedAudioUrl] = useState<string | null>(null);
-  const [customText, setCustomText] = useState('');
-  const [loading, setLoading] = useState(false);
-  const { toast } = useToast();
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null); // For storing the recorded audio
+  const [clonedAudioUrl, setClonedAudioUrl] = useState<string | null>(null); // For storing the cloned voice URL
+  const [customText, setCustomText] = useState(''); // For custom text input
+  const [loading, setLoading] = useState(false); // Loading state
+  const { toast } = useToast(); // Toast for notifications
 
-  const handleRecordingComplete = async (blob: Blob) => {
+  // Handle recording completion
+  const handleRecordingComplete = (blob: Blob) => {
     setAudioBlob(blob);
   };
 
+  // Handle voice cloning
   const handleCloneVoice = async () => {
     if (!audioBlob) return;
 
@@ -30,8 +33,13 @@ export function VoiceClonePage() {
       const file = new File([audioBlob], 'sample.wav', { type: 'audio/wav' });
       const response = await cloneVoice(file, SAMPLE_TEXT, customText);
 
-      // Force fetch the cloned audio file to avoid stale results
-      const clonedBlob = await getAudioFile(response.output_file + `?cache-buster=${Date.now()}`);
+      // Ensuring proper access to `output_file`
+      if (!response.output_file) {
+        throw new Error('No output file returned from the server');
+      }
+
+      // Fetch the cloned audio file
+      const clonedBlob = await getAudioFile(response.output_file);
       const url = URL.createObjectURL(clonedBlob);
       setClonedAudioUrl(url);
 
@@ -50,6 +58,7 @@ export function VoiceClonePage() {
     }
   };
 
+  // Handle file download
   const handleDownload = () => {
     if (clonedAudioUrl) {
       const a = document.createElement('a');
@@ -87,9 +96,7 @@ export function VoiceClonePage() {
           {clonedAudioUrl && !loading && (
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Preview cloned voice:</span>
-              <div>
-                <AudioPlayer audioUrl={clonedAudioUrl} onDownload={handleDownload} />
-              </div>
+              <AudioPlayer audioUrl={clonedAudioUrl} onDownload={handleDownload} />
             </div>
           )}
 
