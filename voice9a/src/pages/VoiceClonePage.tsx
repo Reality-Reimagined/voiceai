@@ -11,6 +11,11 @@ import { Input } from '@/components/ui/input';
 
 const SAMPLE_TEXT = "The quick brown fox jumps over the lazy dog. I love technology and innovation. Voice cloning is an amazing advancement in artificial intelligence. This sample will help create a unique voice model that captures my speech patterns and tone.";
 
+// Define the expected response structure
+type CloneVoiceResponse = {
+  output_file: string;
+};
+
 export function VoiceClonePage() {
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [clonedAudioUrl, setClonedAudioUrl] = useState<string | null>(null);
@@ -39,12 +44,13 @@ export function VoiceClonePage() {
     setLoading(true);
     try {
       const file = new File([audioBlob], 'sample.wav', { type: 'audio/wav' });
-      const response = await cloneVoice(file, SAMPLE_TEXT, customText);
-      if (!response || !response.output_file) {
+      const response: CloneVoiceResponse = await cloneVoice(file, SAMPLE_TEXT, customText);
+
+      if (!response.output_file) {
         throw new Error('Voice cloning failed. Please try again.');
       }
 
-      // Always fetch the audio file even if it might already exist
+      // Fetch the audio file using the output_file from the response
       const clonedBlob = await getAudioFile(response.output_file);
       const url = URL.createObjectURL(clonedBlob);
       setClonedAudioUrl(url);
