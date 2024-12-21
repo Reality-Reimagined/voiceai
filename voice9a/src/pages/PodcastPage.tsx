@@ -116,33 +116,73 @@ export function PodcastPage() {
     if (!hasKey) setShowApiKeyDialog(true);
   };
 
-  const generateScript = async () => {
-  if (!topic || !provider || !model || !podcastName) {
-    toast({ title: 'Error', description: 'Please fill in all required fields', variant: 'destructive' });
-    return;
-  }
-  setLoading(true);
-  try {
-    const { data } = await supabase
-      .from('api_keys')
-      .select('key')
-      .eq('provider', provider)
-      .single();
-    const key = data?.key;
-    if (!key) throw new Error('API key not found');
+//   const generateScript = async () => {
+//   if (!topic || !provider || !model || !podcastName) {
+//     toast({ title: 'Error', description: 'Please fill in all required fields', variant: 'destructive' });
+//     return;
+//   }
+//   setLoading(true);
+//   try {
+//     const { data } = await supabase
+//       .from('api_keys')
+//       .select('key')
+//       .eq('provider', provider)
+//       .single();
+//     const key = data?.key;
+//     if (!key) throw new Error('API key not found');
 
-    const prompt = PODCAST_PROMPT(podcastName, topic);
-    const result = await generateWithLLM(prompt, provider, model, key);
-    if (result.error) throw new Error(result.error);
+//     const prompt = PODCAST_PROMPT(podcastName, topic);
+//     const result = await generateWithLLM(prompt, provider, model, key);
+//     if (result.error) throw new Error(result.error);
 
-    setScript(result.script);
-    toast({ title: 'Success', description: 'Script generated successfully!' });
-  } catch (error) {
-    toast({ title: 'Error', description: error instanceof Error ? error.message : 'Failed to generate script', variant: 'destructive' });
-  } finally {
-    setLoading(false);
-  }
-};
+//     setScript(result.script);
+//     toast({ title: 'Success', description: 'Script generated successfully!' });
+//   } catch (error) {
+//     toast({ title: 'Error', description: error instanceof Error ? error.message : 'Failed to generate script', variant: 'destructive' });
+//   } finally {
+//     setLoading(false);
+//   }
+// };
+
+    const generateScript = async () => {
+    if (!topic || !provider || !model || !podcastName) {
+      toast({
+        title: 'Error',
+        description: 'Please fill in all required fields',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const key = await checkApiKey(provider);
+      if (!key) {
+        throw new Error('API key not found');
+      }
+
+      const prompt = PODCAST_PROMPT(podcastName, topic);
+      const result = await generateWithLLM(prompt, provider, model, key);
+
+      if (result.error) {
+        throw new Error(result.error);
+      }
+
+      setScript(result.script);
+      toast({
+        title: 'Success',
+        description: 'Script generated successfully!',
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to generate script',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCreatePodcast = async () => {
   if (!script || !mainVoice || !townVoice || !countryVoice) {
