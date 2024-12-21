@@ -1,4 +1,4 @@
-import { useState } from 'react';
+// import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
 import { AudioRecorder } from '@/components/voice-clone/AudioRecorder';
@@ -7,14 +7,9 @@ import { cloneVoice, getAudioFile } from '@/lib/api';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 
-const SAMPLE_TEXT = "The quick brown fox jumps over the lazy dog. I love technology and innovation. Voice cloning is an amazing advancement in artificial intelligence. This sample will help create a unique voice model that captures my speech patterns and tone.";
-
-// Define the expected response structure
-type CloneVoiceResponse = {
-  output_file: string;
-};
+const SAMPLE_TEXT =
+  'The quick brown fox jumps over the lazy dog. I love technology and innovation. Voice cloning is an amazing advancement in artificial intelligence. This sample will help create a unique voice model that captures my speech patterns and tone.';
 
 export function VoiceClonePage() {
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
@@ -25,33 +20,18 @@ export function VoiceClonePage() {
 
   const handleRecordingComplete = async (blob: Blob) => {
     setAudioBlob(blob);
-    toast({
-      title: 'Recording Complete',
-      description: 'Your voice recording is ready for cloning.',
-    });
   };
 
   const handleCloneVoice = async () => {
-    if (!audioBlob) {
-      toast({
-        title: 'Error',
-        description: 'Please record your voice first.',
-        variant: 'destructive',
-      });
-      return;
-    }
+    if (!audioBlob) return;
 
     setLoading(true);
     try {
       const file = new File([audioBlob], 'sample.wav', { type: 'audio/wav' });
-      const response: CloneVoiceResponse = await cloneVoice(file, SAMPLE_TEXT, customText);
+      const response = await cloneVoice(file, SAMPLE_TEXT, customText);
 
-      if (!response.output_file) {
-        throw new Error('Voice cloning failed. Please try again.');
-      }
-
-      // Fetch the audio file using the output_file from the response
-      const clonedBlob = await getAudioFile(response.output_file);
+      // Force fetch the cloned audio file to avoid stale results
+      const clonedBlob = await getAudioFile(response.output_file + `?cache-buster=${Date.now()}`);
       const url = URL.createObjectURL(clonedBlob);
       setClonedAudioUrl(url);
 
@@ -104,27 +84,30 @@ export function VoiceClonePage() {
             </div>
           )}
 
-          {!loading && clonedAudioUrl && (
+          {clonedAudioUrl && !loading && (
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Preview cloned voice:</span>
-              <AudioPlayer audioUrl={clonedAudioUrl} onDownload={handleDownload} />
+              <div>
+                <AudioPlayer audioUrl={clonedAudioUrl} onDownload={handleDownload} />
+              </div>
             </div>
           )}
 
           {audioBlob && !loading && (
-            <div className="space-y-2">
-              <label htmlFor="custom-text" className="font-medium">
+            <div className="mt-4 space-y-2">
+              <label htmlFor="custom-text" className="block font-medium">
                 What do you want to say with your new voice?
               </label>
-              <Input
+              <textarea
                 id="custom-text"
                 value={customText}
                 onChange={(e) => setCustomText(e.target.value)}
-                placeholder="Enter text to synthesize"
-              />
-              <Button onClick={handleCloneVoice} disabled={loading}>
-                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Clone Voice
+                className="w-full p-2 border rounded-md"
+                placeholder="Type your text here..."
+                rows={3}
+              ></textarea>
+              <Button onClick={handleCloneVoice} disabled={loading} className="mt-2">
+                {loading ? 'Cloning Voice...' : 'Clone Voice'}
               </Button>
             </div>
           )}
@@ -133,6 +116,7 @@ export function VoiceClonePage() {
     </div>
   );
 }
+
 
 
 
