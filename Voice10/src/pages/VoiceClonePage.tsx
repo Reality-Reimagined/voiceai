@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/components/ui/use-toast';
 import { AudioRecorder } from '@/components/voice-clone/AudioRecorder';
 import { AudioPlayer } from '@/components/text-to-speech/AudioPlayer';
-import { cloneVoice, getAudioFile } from '@/lib/api';
+import { cloneVoice } from '@/lib/api';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
