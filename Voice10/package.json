@@ -68,7 +68,7 @@
     "vue-toast-notification": "^3.1.3",
     
     "zod": "^3.23.8",
-    "wavesurfer": "^7.8.11",
+    "wavesurfer.js": "^7.8.11",
     "zustand": "^4.5.2"
   },
   "devDependencies": {
