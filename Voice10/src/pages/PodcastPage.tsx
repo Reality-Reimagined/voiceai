@@ -15,7 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Textarea } from '@/components/ui/textarea';
 import { generateWithLLM } from '@/lib/llm';
 import { PODCAST_PROMPT } from '@/lib/config';
-import { ChevronDown, ChevronUp, Search, Replace } from 'lucide-react';
+import { ChevronDown, ChevronUp, } from 'lucide-react';
 
 const API_CONFIG = {
   TTS_SERVICE_URL: import.meta.env.VITE_TTS_SERVICE_URL || 'http://localhost:8000'
@@ -64,10 +64,10 @@ export function PodcastPage() {
   const { toast } = useToast();
   const [isTopicExpanded, setIsTopicExpanded] = useState(false);
 
-  const getVoiceFileName = (voiceType: keyof UploadedFiles) => {
-    const file = userUploadedFiles[voiceType];
-    return file ? file.name : 'No file uploaded';
-  };
+  // const getVoiceFileName = (voiceType: keyof UploadedFiles) => {
+  //   const file = userUploadedFiles[voiceType];
+  //   return file ? file.name : 'No file uploaded';
+  // };
 
   const checkApiKey = async (provider: string): Promise<string | null> => {
     // Check environment variable
@@ -305,12 +305,12 @@ export function PodcastPage() {
     }
   };
   
-  const validateFlacFile = (file: File) => {
-    if (!file.type.includes('flac')) {
-      throw new Error('Only FLAC files are supported');
-    }
-    return true;
-  };
+  // const validateFlacFile = (file: File) => {
+  //   if (!file.type.includes('flac')) {
+  //     throw new Error('Only FLAC files are supported');
+  //   }
+  //   return true;
+  // };
 
   return (
       <div className="container max-w-4xl py-8">
