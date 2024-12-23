@@ -1,0 +1,1 @@
+{/* Remove the chart component since it's not being used */}
